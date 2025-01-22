@@ -10,6 +10,7 @@
 
   # https://devenv.sh/languages/
   languages = {
+    go.enable = true;
     python = {
       enable = true;
       version = "3.12";
