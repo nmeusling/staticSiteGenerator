@@ -3,7 +3,7 @@ import unittest
 
 from textnode import TextNode, TextType
 
-from split_nodes_delimiter import split_nodes_delimiter
+from markdown_tools import split_nodes_delimiter, extract_markdown_images
 
 class TestSplitNodesDelimiter(unittest.TestCase):
     def test_single_node_split(self):
@@ -86,3 +86,22 @@ class TestSplitNodesDelimiter(unittest.TestCase):
         new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
         expected = [TextNode("This has no delimiters", TextType.NORMAL)]
         self.assertEqual(new_nodes, expected)
+
+class TestExtractMarkdownImages(unittest.TestCase):
+    def test_single_image(self):
+        text = "This is text with a ![alt text](www.source.url)"
+        result = extract_markdown_images(text)
+        expected = [("alt text", "www.source.url")]
+        self.assertEqual(result, expected)
+
+    def test_multiple_images(self):
+        text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+        result = extract_markdown_images(text) 
+        expected = [("rick roll", "https://i.imgur.com/aKaOqIh.gif"), ("obi wan", "https://i.imgur.com/fJRm4Vk.jpeg")]
+        self.assertEqual(result, expected)
+
+    def test_no_images(self):
+        text = "This is text with no images"
+        result = extract_markdown_images(text) 
+        expected = []
+        self.assertEqual(result, expected)

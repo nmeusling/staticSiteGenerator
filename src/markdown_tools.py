@@ -30,3 +30,9 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
             else:
                 new_nodes.append(TextNode(parts[i], delimiters[delimiter]))
     return new_nodes
+
+def extract_markdown_images(text):
+    alt_text = ""
+    url = ""
+
+    return alt_text, url    
