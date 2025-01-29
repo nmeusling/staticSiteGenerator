@@ -32,6 +32,19 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
                 new_nodes.append(TextNode(parts[i], delimiters[delimiter]))
     return new_nodes
 
+def split_nodes_link(old_nodes):
+    new_nodes = []
+    for node in old_nodes:
+        text = node.text
+        links = extract_markdown_links(node.text)
+        for i in range(len(links)):
+            link_text = f"[{links[i][0]}]({links[i][1]})"
+            parts = text.split(link_text)
+            new_nodes.append(TextNode(parts[0], TextType.NORMAL))
+            new_nodes.append(TextNode(links[i][0], TextType.LINK, links[i][1]))
+            new_nodes.append(TextNode(parts[1], TextType.NORMAL))
+    return new_nodes
+
 def extract_markdown_images(text):
     pattern = r"!\[(.*?)\]\((.*?)\)"
     return re.findall(pattern, text) 
