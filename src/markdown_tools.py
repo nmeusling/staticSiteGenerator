@@ -2,8 +2,6 @@ import re
 from textnode import TextType, TextNode
 
 
-
-
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
     delimiters = {
         "**": TextType.BOLD,
@@ -45,6 +43,26 @@ def split_nodes_link(old_nodes):
                 new_nodes.append(TextNode(parts[0], TextType.NORMAL))
             # add the link node
             new_nodes.append(TextNode(links[i][0], TextType.LINK, links[i][1]))
+            # this is the last link
+            if i == len(links) - 1 and parts[1]:
+                new_nodes.append(TextNode(parts[1], TextType.NORMAL))
+            else:
+                text = parts[1] 
+    return new_nodes
+
+def split_nodes_image(old_nodes):
+    new_nodes = []
+    for node in old_nodes:
+        text = node.text
+        links = extract_markdown_images(node.text)
+        for i in range(len(links)):
+            link_text = f"![{links[i][0]}]({links[i][1]})"
+            parts = text.split(link_text)
+            # there is text before the link
+            if parts[0]:
+                new_nodes.append(TextNode(parts[0], TextType.NORMAL))
+            # add the link node
+            new_nodes.append(TextNode(links[i][0], TextType.IMAGE, links[i][1]))
             # this is the last link
             if i == len(links) - 1 and parts[1]:
                 new_nodes.append(TextNode(parts[1], TextType.NORMAL))
