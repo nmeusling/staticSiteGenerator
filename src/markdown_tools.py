@@ -40,9 +40,16 @@ def split_nodes_link(old_nodes):
         for i in range(len(links)):
             link_text = f"[{links[i][0]}]({links[i][1]})"
             parts = text.split(link_text)
-            new_nodes.append(TextNode(parts[0], TextType.NORMAL))
+            # there is text before the link
+            if parts[0]:
+                new_nodes.append(TextNode(parts[0], TextType.NORMAL))
+            # add the link node
             new_nodes.append(TextNode(links[i][0], TextType.LINK, links[i][1]))
-            new_nodes.append(TextNode(parts[1], TextType.NORMAL))
+            # this is the last link
+            if i == len(links) - 1 and parts[1]:
+                new_nodes.append(TextNode(parts[1], TextType.NORMAL))
+            else:
+                text = parts[1] 
     return new_nodes
 
 def extract_markdown_images(text):
@@ -50,5 +57,5 @@ def extract_markdown_images(text):
     return re.findall(pattern, text) 
 
 def extract_markdown_links(text):
-    pattern = r"[^!]\[(.*?)\]\((.*?)\)"
+    pattern = r"(?<!!)\[(.*?)\]\((.*?)\)"
     return re.findall(pattern, text)
