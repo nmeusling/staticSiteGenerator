@@ -35,6 +35,9 @@ def split_nodes_link(old_nodes):
     for node in old_nodes:
         text = node.text
         links = extract_markdown_links(node.text)
+        if not links:
+            new_nodes.append(node)
+            continue
         for i in range(len(links)):
             link_text = f"[{links[i][0]}]({links[i][1]})"
             parts = text.split(link_text)
@@ -55,6 +58,8 @@ def split_nodes_image(old_nodes):
     for node in old_nodes:
         text = node.text
         links = extract_markdown_images(node.text)
+        if not links:
+            new_nodes.append(node)
         for i in range(len(links)):
             link_text = f"![{links[i][0]}]({links[i][1]})"
             parts = text.split(link_text)

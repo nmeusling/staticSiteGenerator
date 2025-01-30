@@ -164,6 +164,25 @@ class TestSplitNodesLink(unittest.TestCase):
         ]
         self.assertEqual(new_nodes, expected)
 
+    def test_multiple_link_nodes(self):
+        nodes = [
+            TextNode(
+                "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)",
+                TextType.NORMAL,
+            ),
+            TextNode("This text has [link again](www.test.com)", TextType.NORMAL)
+        ]
+        new_nodes = split_nodes_link(nodes)
+        expected = [
+            TextNode("This is text with a link ", TextType.NORMAL),
+            TextNode("to boot dev", TextType.LINK, "https://www.boot.dev"),
+            TextNode(" and ", TextType.NORMAL),
+            TextNode("to youtube", TextType.LINK, "https://www.youtube.com/@bootdotdev"),
+            TextNode("This text has ", TextType.NORMAL),
+            TextNode("link again", TextType.LINK, "www.test.com"),
+        ]
+        self.assertEqual(new_nodes, expected)
+
     def test_multiple_links_start_middle_end(self):
         node = TextNode(
             "[This](www.link.com) is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)",
@@ -228,6 +247,22 @@ class TestSplitNodesLink(unittest.TestCase):
         ]
         self.assertEqual(new_nodes, expected)
 
+    def test_no_link(self):
+        node = TextNode("simple text node", TextType.NORMAL)
+        new_nodes = split_nodes_link([node])
+        expected = [TextNode("simple text node", TextType.NORMAL)]
+
+    def test_node_with_image_no_link(self):
+        node = TextNode(
+            "Text with a ![photo](https://www.boot.dev) but no link",
+            TextType.NORMAL,
+        )
+        new_nodes = split_nodes_link([node])
+        expected = [
+            TextNode("Text with a ![photo](https://www.boot.dev) but no link", TextType.NORMAL)]
+        self.assertEqual(new_nodes, expected)
+
+
 class TestSplitNodesImage(unittest.TestCase):
     def test_multiple_images(self):
         node = TextNode(
@@ -239,7 +274,26 @@ class TestSplitNodesImage(unittest.TestCase):
             TextNode("This is text with image ", TextType.NORMAL),
             TextNode("to boot dev", TextType.IMAGE, "www.source.url"),
             TextNode(" and ", TextType.NORMAL),
-            TextNode("another image", TextType.LINK, "www.source2.com"),
+            TextNode("another image", TextType.IMAGE, "www.source2.com"),
+        ]
+        self.assertEqual(new_nodes, expected)
+
+    def test_multiple_image_nodes(self):
+        nodes = [
+            TextNode(
+                "This is text with image ![to boot dev](www.source.url) and ![another image](www.source2.com)",
+                TextType.NORMAL,
+            ),
+            TextNode("another ![image](www.source.com)", TextType.NORMAL)
+            ]
+        new_nodes = split_nodes_image(nodes)
+        expected = [
+            TextNode("This is text with image ", TextType.NORMAL),
+            TextNode("to boot dev", TextType.IMAGE, "www.source.url"),
+            TextNode(" and ", TextType.NORMAL),
+            TextNode("another image", TextType.IMAGE, "www.source2.com"),
+            TextNode("another ", TextType.NORMAL),
+            TextNode("image", TextType.IMAGE, "www.source.com"),
         ]
         self.assertEqual(new_nodes, expected)
 
@@ -289,7 +343,7 @@ class TestSplitNodesImage(unittest.TestCase):
             "![Starting image](https://www.boot.dev) with text",
             TextType.NORMAL,
         )
-        new_nodes = split_nodes_images([node])
+        new_nodes = split_nodes_image([node])
         expected = [
             TextNode("Starting image", TextType.IMAGE, "https://www.boot.dev"),
             TextNode(" with text", TextType.NORMAL),
@@ -301,10 +355,23 @@ class TestSplitNodesImage(unittest.TestCase):
             "![Starting image](https://www.boot.dev)",
             TextType.NORMAL,
         )
-        new_nodes = split_nodes_images([node])
+        new_nodes = split_nodes_image([node])
         expected = [
             TextNode("Starting image", TextType.IMAGE, "https://www.boot.dev"),
         ]
         self.assertEqual(new_nodes, expected)
 
-# test multiple links and images together; list of nodes
+    def test_no_image(self):
+        node = TextNode("simple text node", TextType.NORMAL)
+        new_nodes = split_nodes_image([node])
+        expected = [TextNode("simple text node", TextType.NORMAL)]
+
+    def test_node_with_link_no_image(self):
+        node = TextNode(
+            "Text with a [link](https://www.boot.dev) but no image",
+            TextType.NORMAL,
+        )
+        new_nodes = split_nodes_image([node])
+        expected = [
+            TextNode("Text with a [link](https://www.boot.dev) but no image", TextType.NORMAL)]
+        self.assertEqual(new_nodes, expected)
