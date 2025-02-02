@@ -1,6 +1,5 @@
-import re
-from nodes.textnode import TextType, TextNode
-
+from nodes.textnode import TextNode, TextType
+from markdown_tools.extract_inline import extract_markdown_images, extract_markdown_links
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
     delimiters = {
@@ -74,20 +73,3 @@ def split_nodes_image(old_nodes):
             else:
                 text = parts[1] 
     return new_nodes
-
-def extract_markdown_images(text):
-    pattern = r"!\[(.*?)\]\((.*?)\)"
-    return re.findall(pattern, text) 
-
-def extract_markdown_links(text):
-    pattern = r"(?<!!)\[(.*?)\]\((.*?)\)"
-    return re.findall(pattern, text)
-
-def text_to_textnodes(text):
-    nodes = [TextNode(text, TextType.NORMAL)]
-    nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)
-    nodes = split_nodes_delimiter(nodes, "*", TextType.ITALIC)
-    nodes = split_nodes_delimiter(nodes, "`", TextType.CODE)
-    nodes = split_nodes_image(nodes)
-    nodes = split_nodes_link(nodes)
-    return nodes

@@ -2,8 +2,8 @@ import unittest
 
 
 from nodes.textnode import TextNode, TextType
+from markdown_tools.split_nodes import split_nodes_delimiter, split_nodes_image, split_nodes_link
 
-from markdown_tools import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_link, split_nodes_image, text_to_textnodes
 
 class TestSplitNodesDelimiter(unittest.TestCase):
     def test_single_node_split(self):
@@ -86,68 +86,6 @@ class TestSplitNodesDelimiter(unittest.TestCase):
         new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
         expected = [TextNode("This has no delimiters", TextType.NORMAL)]
         self.assertEqual(new_nodes, expected)
-
-class TestExtractMarkdownImages(unittest.TestCase):
-    def test_single_image(self):
-        text = "This is text with a ![alt text](www.source.url)"
-        result = extract_markdown_images(text)
-        expected = [("alt text", "www.source.url")]
-        self.assertEqual(result, expected)
-
-    def test_multiple_images(self):
-        text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
-        result = extract_markdown_images(text) 
-        expected = [("rick roll", "https://i.imgur.com/aKaOqIh.gif"), ("obi wan", "https://i.imgur.com/fJRm4Vk.jpeg")]
-        self.assertEqual(result, expected)
-
-    def test_no_images(self):
-        text = "This is text with no images"
-        result = extract_markdown_images(text) 
-        expected = []
-        self.assertEqual(result, expected)
-    
-    def test_link_not_extracted_as_image(self):
-        text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg) [other](https://i.imgur.com/fJRm4Vk.jpeg)"
-        expected = [("rick roll", "https://i.imgur.com/aKaOqIh.gif"), ("obi wan", "https://i.imgur.com/fJRm4Vk.jpeg")]
-        result = extract_markdown_images(text)
-        self.assertEqual(result, expected)
-
-    def test_text_that_starts_with_image(self):
-        text = "![alt text](www.source.url)"
-        expected = [("alt text", "www.source.url")]
-        result = extract_markdown_images(text)
-        self.assertEqual(result, expected)
-
-class TestExtractMarkdownLinks(unittest.TestCase):
-    def test_single_link(self):
-        text = "This is text with a [link text](www.source.url)"
-        result = extract_markdown_links(text)
-        expected = [("link text", "www.source.url")]
-        self.assertEqual(result, expected)
-
-    def test_multiple_links(self):
-        text = "This is text with a [two links](https://i.imgur.com/aKaOqIh.gif) and [obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
-        result = extract_markdown_links(text) 
-        expected = [("two links", "https://i.imgur.com/aKaOqIh.gif"), ("obi wan", "https://i.imgur.com/fJRm4Vk.jpeg")]
-        self.assertEqual(result, expected)
-
-    def test_no_links(self):
-        text = "This is text with no links"
-        result = extract_markdown_links(text) 
-        expected = []
-        self.assertEqual(result, expected)
-    
-    def test_image_not_extracted_as_link(self):
-        text = "This is text with a [rick roll](www.test.com) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg) [other](www.other.com)"
-        expected = [("rick roll", "www.test.com"), ("other", "www.other.com")]
-        result = extract_markdown_links(text)
-        self.assertEqual(result, expected)
-
-    def test_text_that_starts_with_link(self):
-        text = "[link text](www.test.com)"
-        expected = [("link text", "www.test.com")]
-        result = extract_markdown_links(text)
-        self.assertEqual(result, expected)
 
 class TestSplitNodesLink(unittest.TestCase):
     def test_multiple_links(self):
@@ -375,21 +313,3 @@ class TestSplitNodesImage(unittest.TestCase):
         expected = [
             TextNode("Text with a [link](https://www.boot.dev) but no image", TextType.NORMAL)]
         self.assertEqual(new_nodes, expected)
-
-class TestTextToTextNodes(unittest.TestCase):
-    def test_one_of_each_type(self):
-        text = "This is **text** with an *italic* word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
-        expected = [
-            TextNode("This is ", TextType.NORMAL),
-            TextNode("text", TextType.BOLD),
-            TextNode(" with an ", TextType.NORMAL),
-            TextNode("italic", TextType.ITALIC),
-            TextNode(" word and a ", TextType.NORMAL),
-            TextNode("code block", TextType.CODE),
-            TextNode(" and an ", TextType.NORMAL),
-            TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
-            TextNode(" and a ", TextType.NORMAL),
-            TextNode("link", TextType.LINK, "https://boot.dev"),
-        ]
-        result = text_to_textnodes(text)
-        self.assertEqual(result, expected)
