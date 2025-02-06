@@ -20,13 +20,13 @@ This is a paragraph of text. It has some **bold** and *italic* words inside of i
     def test_empty_block(self):
         markdown = ""
         blocks = markdown_to_blocks(markdown)
-        expected = [""]
+        expected = []
         self.assertEqual(blocks, expected)
 
     def test_blank_blocks_removed(self):
-        markdown = "# This is a heading\n\n\n\n\nThis is a paragraph!\n\n\nOne last paragraph\n\n"
+        markdown = "# This is a heading\n\n\n\n\nThis is a paragraph!\n\n\nOne last paragraph\n\n\n\nAnd one more\n\n\n"
         blocks = markdown_to_blocks(markdown)
-        expected = ["# This is a heading", "This is a paragraph!", "One last paragraph"]
+        expected = ["# This is a heading", "This is a paragraph!", "One last paragraph", "And one more"]
         self.assertEqual(blocks, expected)
 
     def test_white_space_is_stripped(self):
