@@ -1,6 +1,6 @@
 import unittest
 
-from markdown_tools.extract_blocks import markdown_to_blocks
+from markdown_tools.extract_blocks import markdown_to_blocks, block_to_block_type, BlockTypes
 
 class TestExtractBlocks(unittest.TestCase):
     def test_blocks_extracted(self):
@@ -34,3 +34,28 @@ This is a paragraph of text. It has some **bold** and *italic* words inside of i
         blocks = markdown_to_blocks(markdown)
         expected = ["# This is a heading with leading and final whitespace", "Another paragraph.",  "One final paragraph"]
         self.assertEqual(blocks, expected)
+
+class TestBlockToHeader(unittest.TestCase):
+    def test_top_level_header(self):
+        block = "# header"
+        expected_block_type = BlockTypes.HEADING
+        actual = block_to_block_type(block)
+        self.assertEqual(actual, expected_block_type)
+
+    def test_mid_level_header(self):
+        block = "### header"
+        expected_block_type = BlockTypes.HEADING
+        actual = block_to_block_type(block)
+        self.assertEqual(actual, expected_block_type)
+
+    def test_header_no_space(self):
+        block = "#header"
+        expected_block_type = BlockTypes.PARAGRAPH
+        actual = block_to_block_type(block)
+        self.assertEqual(actual, expected_block_type)
+
+    def test_too_many_levels_header(self):
+        block = "####### header"
+        expected_block_type = BlockTypes.PARAGRAPH
+        actual = block_to_block_type(block)
+        self.assertEqual(actual, expected_block_type)
