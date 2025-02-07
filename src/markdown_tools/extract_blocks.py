@@ -16,9 +16,31 @@ def markdown_to_blocks(markdown):
     return blocks
 
 def block_to_block_type(block):
-
-    if block[0:3] == '```' and block[-3:] == '```':
+    type_to_pattern = {
+        BlockTypes.CODE: r"^```.*```$",
+        BlockTypes.HEADING: r"^[#]{1,6} "
+    }
+    if re.search(type_to_pattern[BlockTypes.HEADING], block):
+        return BlockTypes.HEADING
+    if re.search(type_to_pattern[BlockTypes.CODE], block):
         return BlockTypes.CODE
-    header_pattern = r"^[#]{1,6}"
+    lines = split(block, "\n")
+    
+    type_to_start_char = {
+        BlockTypes.QUOTE:  ">",
+        BlockTypes.UNORDERED_LIST: ""
+    }
+    is_quote = True
+    for line in lines:
+        if line[0] != ">":
+            is_quote = False
+            break
+
+    if is_quote:
+        return BlockTypes.QUOTE
+
+    is_unordered_list = True
+    for line in lines:
+        if line
     
     return BlockTypes.PARAGRAPH

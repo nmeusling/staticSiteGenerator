@@ -59,3 +59,28 @@ class TestBlockToHeader(unittest.TestCase):
         expected_block_type = BlockTypes.PARAGRAPH
         actual = block_to_block_type(block)
         self.assertEqual(actual, expected_block_type)
+
+class TestBlockToCode(unittest.TestCase):
+    def test_start_and_end_code(self):
+        block = r"```test code; \n more lines;\n one more```"
+        expected_block_type = BlockTypes.CODE
+        actual = block_to_block_type(block)
+        self.assertEqual(actual, expected_block_type)
+
+    def test_start_code(self):
+        block = r"``` test code"
+        expected_block_type = BlockTypes.PARAGRAPH
+        actual = block_to_block_type(block)
+        self.assertEqual(actual, expected_block_type)
+    
+    def test_end_code(self):
+        block = r"header```"
+        expected_block_type = BlockTypes.PARAGRAPH
+        actual = block_to_block_type(block)
+        self.assertEqual(actual, expected_block_type)
+    
+    def test_ticks_not_first_characters(self):
+        block = r"t```test code; \n more lines;\n one more```"
+        expected_block_type = BlockTypes.PARAGRAPH
+        actual = block_to_block_type(block)
+        self.assertEqual(actual, expected_block_type)
