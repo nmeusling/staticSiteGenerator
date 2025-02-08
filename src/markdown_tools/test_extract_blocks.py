@@ -72,7 +72,7 @@ class TestBlockToCode(unittest.TestCase):
         expected_block_type = BlockTypes.PARAGRAPH
         actual = block_to_block_type(block)
         self.assertEqual(actual, expected_block_type)
-    
+
     def test_end_code(self):
         block = r"header```"
         expected_block_type = BlockTypes.PARAGRAPH
@@ -82,5 +82,98 @@ class TestBlockToCode(unittest.TestCase):
     def test_ticks_not_first_characters(self):
         block = r"t```test code; \n more lines;\n one more```"
         expected_block_type = BlockTypes.PARAGRAPH
+        actual = block_to_block_type(block)
+        self.assertEqual(actual, expected_block_type)
+
+class TestBlockToQuote(unittest.TestCase):
+    def test_not_all_lines_with_quote(self):
+        block = ">this line is quote\nthis line is not"
+        expected_block_type = BlockTypes.PARAGRAPH
+        actual = block_to_block_type(block)
+        self.assertEqual(actual, expected_block_type)
+
+    def test_single_line_quote(self):
+        block = ">this line is quote"
+        expected_block_type = BlockTypes.QUOTE
+        actual = block_to_block_type(block)
+        self.assertEqual(actual, expected_block_type)
+
+    def test_multiline_quote(self):
+        block = ">this line is quote\n> this line is also a quote\n>and this one too"
+        expected_block_type = BlockTypes.QUOTE
+        actual = block_to_block_type(block)
+        self.assertEqual(actual, expected_block_type)
+
+class TestBlockToOrderedList(unittest.TestCase):
+    def test_not_all_lines_with_pattern(self):
+        block = "1. this line is list\nthis line is not"
+        expected_block_type = BlockTypes.PARAGRAPH
+        actual = block_to_block_type(block)
+        self.assertEqual(actual, expected_block_type)
+
+    def test_missing_space(self):
+        block = "1.this line is not a list"
+        expected_block_type = BlockTypes.PARAGRAPH
+        actual = block_to_block_type(block)
+        self.assertEqual(actual, expected_block_type)
+
+    def test_missing_period(self):
+        block = "1 this line is not a list"
+        expected_block_type = BlockTypes.PARAGRAPH
+        actual = block_to_block_type(block)
+        self.assertEqual(actual, expected_block_type)
+    
+    def test_missing_number(self):
+        block = "a.this line is not a list"
+        expected_block_type = BlockTypes.PARAGRAPH
+        actual = block_to_block_type(block)
+        self.assertEqual(actual, expected_block_type)
+
+    def test_single_line_ordered_list(self):
+        block = "3. this line is ordered list"
+        expected_block_type = BlockTypes.ORDERED_LIST
+        actual = block_to_block_type(block)
+        self.assertEqual(actual, expected_block_type)
+
+    def test_multiline_ordered_list(self):
+        block = "3. this line is list\n2. this line is also a list\n1. and this one too"
+        expected_block_type = BlockTypes.ORDERED_LIST
+        actual = block_to_block_type(block)
+        self.assertEqual(actual, expected_block_type)
+
+class TestBlockToUnorderedList(unittest.TestCase):
+    def test_not_all_lines_with_pattern(self):
+        block = "* this line is list\nthis line is not"
+        expected_block_type = BlockTypes.PARAGRAPH
+        actual = block_to_block_type(block)
+        self.assertEqual(actual, expected_block_type)
+
+    def test_missing_space(self):
+        block = "-this line is not a list"
+        expected_block_type = BlockTypes.PARAGRAPH
+        actual = block_to_block_type(block)
+        self.assertEqual(actual, expected_block_type)
+    
+    def test_missing_char(self):
+        block = "a this line is not a list"
+        expected_block_type = BlockTypes.PARAGRAPH
+        actual = block_to_block_type(block)
+        self.assertEqual(actual, expected_block_type)
+
+    def test_single_line_unordered_list_asterisk(self):
+        block = "* this line is unordered list"
+        expected_block_type = BlockTypes.UNORDERED_LIST
+        actual = block_to_block_type(block)
+        self.assertEqual(actual, expected_block_type)
+
+    def test_single_line_unordered_list_minus(self):
+        block = "- this line is unordered"
+        expected_block_type = BlockTypes.UNORDERED_LIST
+        actual = block_to_block_type(block)
+        self.assertEqual(actual, expected_block_type)
+
+    def test_multiline_unordered_list(self):
+        block = "* this line is list\n- this line is also a list\n- and this one too"
+        expected_block_type = BlockTypes.UNORDERED_LIST
         actual = block_to_block_type(block)
         self.assertEqual(actual, expected_block_type)

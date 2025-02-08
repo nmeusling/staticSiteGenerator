@@ -18,29 +18,28 @@ def markdown_to_blocks(markdown):
 def block_to_block_type(block):
     type_to_pattern = {
         BlockTypes.CODE: r"^```.*```$",
-        BlockTypes.HEADING: r"^[#]{1,6} "
+        BlockTypes.HEADING: r"^[#]{1,6} ",
+        BlockTypes.QUOTE: "^>",
+        BlockTypes.UNORDERED_LIST: "^[-*] ",
+        BlockTypes.ORDERED_LIST: "^\d. "
     }
+
     if re.search(type_to_pattern[BlockTypes.HEADING], block):
         return BlockTypes.HEADING
     if re.search(type_to_pattern[BlockTypes.CODE], block):
         return BlockTypes.CODE
-    lines = split(block, "\n")
     
-    type_to_start_char = {
-        BlockTypes.QUOTE:  ">",
-        BlockTypes.UNORDERED_LIST: ""
-    }
-    is_quote = True
-    for line in lines:
-        if line[0] != ">":
-            is_quote = False
-            break
-
-    if is_quote:
+    if lines_start_with_pattern(block, type_to_pattern[BlockTypes.QUOTE]):
         return BlockTypes.QUOTE
-
-    is_unordered_list = True
-    for line in lines:
-        if line
-    
+    if lines_start_with_pattern(block, type_to_pattern[BlockTypes.UNORDERED_LIST]):
+        return BlockTypes.UNORDERED_LIST
+    if lines_start_with_pattern(block, type_to_pattern[BlockTypes.ORDERED_LIST]):
+        return BlockTypes.ORDERED_LIST
     return BlockTypes.PARAGRAPH
+
+def lines_start_with_pattern(block, pattern):
+    lines = block.split("\n")
+    for line in lines:
+        if not re.search(pattern, line):
+            return False
+    return True
