@@ -62,25 +62,35 @@ class TestBlockToHeader(unittest.TestCase):
 
 class TestBlockToCode(unittest.TestCase):
     def test_start_and_end_code(self):
-        block = r"```test code; \n more lines;\n one more```"
+        # block = "```test code; \n more lines;\n one more```"
+        block = "```test code block;```"
+        expected_block_type = BlockTypes.CODE
+        actual = block_to_block_type(block)
+        self.assertEqual(actual, expected_block_type)
+
+    def test_multiline_code_block(self):
+        block = """```
+        def function():
+            do_something();
+        ```"""
         expected_block_type = BlockTypes.CODE
         actual = block_to_block_type(block)
         self.assertEqual(actual, expected_block_type)
 
     def test_start_code(self):
-        block = r"``` test code"
+        block = "``` test code"
         expected_block_type = BlockTypes.PARAGRAPH
         actual = block_to_block_type(block)
         self.assertEqual(actual, expected_block_type)
 
     def test_end_code(self):
-        block = r"header```"
+        block = "header```"
         expected_block_type = BlockTypes.PARAGRAPH
         actual = block_to_block_type(block)
         self.assertEqual(actual, expected_block_type)
     
     def test_ticks_not_first_characters(self):
-        block = r"t```test code; \n more lines;\n one more```"
+        block = "t```test code; \n more lines;\n one more```"
         expected_block_type = BlockTypes.PARAGRAPH
         actual = block_to_block_type(block)
         self.assertEqual(actual, expected_block_type)

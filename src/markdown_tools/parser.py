@@ -28,13 +28,21 @@ def markdown_to_html_node(markdown):
             node = ParentNode("pre", [
                 ParentNode("code", children)
             ])
-            pass
         elif block_type == BlockTypes.QUOTE:
-            pass
+            children = text_to_children(remove_formatting(block, BlockTypes.QUOTE))
+            node = ParentNode("blockquote", children)
         elif block_type == BlockTypes.UNORDERED_LIST:
-            pass
+            children = text_to_children(remove_formatting(block, BlockTypes.UNORDERED_LIST))
+            list_items = block.split("\n")
+            node = ParentNode("ul", [
+                ParentNode("li", text_to_children(remove_formatting(list_item, BlockTypes.UNORDERED_LIST))) for list_item in list_items
+            ])
         elif block_type == BlockTypes.ORDERED_LIST:
-            pass
+            children = text_to_children(remove_formatting(block, BlockTypes.ORDERED_LIST))
+            list_items = block.split("\n")
+            node = ParentNode("ol", [
+                ParentNode("li", text_to_children(remove_formatting(list_item, BlockTypes.ORDERED_LIST))) for list_item in list_items
+            ])
         nodes.append(node)
     root = ParentNode("div", nodes)
     return root
@@ -64,3 +72,20 @@ def remove_formatting(text, block_type):
         return text.lstrip("# ")
     if block_type == BlockTypes.CODE:
         return text.strip("`")
+    if block_type == BlockTypes.QUOTE:
+        lines = []
+        for line in text.split("\n"):
+            lines.append(line.lstrip(">"))
+        return "\n".join(lines)
+    if block_type == BlockTypes.ORDERED_LIST:
+        lines = []
+        for line in text.split("\n"):
+            parts = line.split(". ")
+            new_line = ".".join(parts[1:])
+            lines.append(new_line)
+        return "\n".join(lines)
+    if block_type == BlockTypes.UNORDERED_LIST:
+        lines = []
+        for line in text.split("\n"):
+            lines.append(line[2:])
+        return "\n".join(lines)

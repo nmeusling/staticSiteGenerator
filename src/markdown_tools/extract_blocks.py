@@ -17,8 +17,7 @@ def markdown_to_blocks(markdown):
 
 def block_to_block_type(block):
     type_to_pattern = {
-        BlockTypes.CODE: r"^```.*```$",
-        BlockTypes.HEADING: r"^[#]{1,6} ",
+        BlockTypes.HEADING: "^[#]{1,6} ",
         BlockTypes.QUOTE: "^>",
         BlockTypes.UNORDERED_LIST: "^[-*] ",
         BlockTypes.ORDERED_LIST: "^\d. "
@@ -26,7 +25,7 @@ def block_to_block_type(block):
 
     if re.search(type_to_pattern[BlockTypes.HEADING], block):
         return BlockTypes.HEADING
-    if re.search(type_to_pattern[BlockTypes.CODE], block):
+    if block[0:3] == "```" and block[-3:] == "```":
         return BlockTypes.CODE
     
     if lines_start_with_pattern(block, type_to_pattern[BlockTypes.QUOTE]):
