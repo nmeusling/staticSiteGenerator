@@ -5,9 +5,9 @@ from markdown_tools.extract_blocks import markdown_to_blocks, block_to_block_typ
 
 def text_to_textnodes(text):
     nodes = [TextNode(text, TextType.NORMAL)]
+    nodes = split_nodes_delimiter(nodes, "`", TextType.CODE)
     nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)
     nodes = split_nodes_delimiter(nodes, "*", TextType.ITALIC)
-    nodes = split_nodes_delimiter(nodes, "`", TextType.CODE)
     nodes = split_nodes_image(nodes)
     nodes = split_nodes_link(nodes)
     return nodes
@@ -24,7 +24,7 @@ def markdown_to_html_node(markdown):
             children = text_to_children(remove_formatting(block, BlockTypes.HEADING))
             node = ParentNode(get_heading_level_tag(block), children)
         elif block_type == BlockTypes.CODE:
-            children = text_to_children(remove_formatting(block, BlockTypes.CODE))
+            children = [TextNode(remove_formatting(block, BlockTypes.CODE), TextType.CODE)]
             node = ParentNode("pre", [
                 ParentNode("code", children)
             ])

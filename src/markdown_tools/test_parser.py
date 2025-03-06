@@ -134,6 +134,7 @@ class TestMarkdownToHTMLNode(unittest.TestCase):
         text = """```
 def function():
     do_something();
+        this **does** not do _anything_
 ```"""
         expected = ParentNode("div", [
             ParentNode("pre", [
@@ -141,7 +142,8 @@ def function():
                     TextNode("""
 def function():
     do_something();
-""", TextType.NORMAL)
+        this **does** not do _anything_
+""", TextType.CODE)
                 ])
             ])
         ])
@@ -203,6 +205,24 @@ def function():
                 ParentNode("li", [
                     TextNode("fourth item", TextType.NORMAL)
                 ]),
+            ])
+        ])
+        result = markdown_to_html_node(text)
+        self.assertEqual(result, expected)
+
+    def test_paragraph_combine_lines(self):
+        text = """This is a paragraph.
+This is still part of that paragraph.
+Another line in that paragraph.
+
+This is a second paragraph"""
+
+        expected = ParentNode("div", [
+            ParentNode("p", [
+                TextNode("This is a paragraph.\nThis is still part of that paragraph.\nAnother line in that paragraph.", TextType.NORMAL)
+            ]), 
+            ParentNode("p", [
+                TextNode("This is a second paragraph", TextType.NORMAL)
             ])
         ])
         result = markdown_to_html_node(text)
